@@ -1,0 +1,27 @@
+<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Pedidos — High Expert Store</title>
+<script>
+function getToken(){return localStorage.getItem('hx_token')||''}
+function ensureAuthOrRedirect(){ if(!getToken()) location.href='login.html'; }
+function formatBRL(v){return (new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'})).format(v)}
+async function apiGet(u,p={}){const qs=new URLSearchParams(p).toString();const r=await fetch(u+(qs?('?'+qs):''),{headers:{'Accept':'application/json'}});let data,text;try{data=await r.clone().json();}catch{ text=await r.text(); }if(!r.ok) throw new Error((data&&data.error)?data.error:(text||'Erro'));return data||JSON.parse(text);}
+async function loadOrders(){
+  const t=getToken();try{
+    const r=await apiGet('/api/orders_list.ashx',{token:t});
+    const tb=document.querySelector('#tb tbody');tb.innerHTML='';
+    for(const o of r.items){
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${o.orderNumber}</td><td>${o.createdAt}</td><td>${formatBRL(o.total)}</td><td>${o.status}</td><td>${o.cep||''}</td>
+      <td><a class="btn" href="/api/invoice_pdf.ashx?token=${encodeURIComponent(t)}&orderNumber=${encodeURIComponent(o.orderNumber)}">Baixar PDF</a></td>`;
+      tb.appendChild(tr);
+    }
+  }catch(e){ alert(e.message); }
+}
+</script>
+<style>body{font-family:system-ui;background:#0f172a;color:#e2e8f0;margin:0}.container{max-width:980px;margin:0 auto;padding:24px}header{display:flex;justify-content:space-between;align-items:center;background:#111827;border-bottom:1px solid #1f2937;padding:14px 24px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #1f2937;text-align:left}.btn{padding:8px 12px;border:1px solid #7c5f0e;border-radius:8px;background:#15192e;color:#e5e7eb}</style>
+</head>
+<body onload="ensureAuthOrRedirect();loadOrders();">
+<header><strong>High Expert Store</strong><nav><a href="index.html" style="color:#d4af37">Loja</a> • <a href="orders.html" style="color:#d4af37">Pedidos</a></nav></header>
+<div class="container"><h2>Seus pedidos</h2>
+<table class="table" id="tb"><thead><tr><th>Número</th><th>Data</th><th>Total</th><th>Status</th><th>CEP</th><th></th></tr></thead><tbody></tbody></table>
+</div>
+</body></html>

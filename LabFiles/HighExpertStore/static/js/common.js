@@ -1,0 +1,6 @@
+const API={register:'/api/auth_register.ashx',login:'/api/auth_login.ashx',products:'/api/products_list.ashx',cartGet:'/api/cart_get.ashx',cartAdd:'/api/cart_add.ashx',cartRemove:'/api/cart_remove.ashx',checkout:'/api/checkout.ashx',wishlistAdd:'/api/wishlist_add.ashx',wishlistList:'/api/wishlist_list.ashx',couponValidate:'/api/coupon_validate.ashx',shippingQuote:'/api/shipping_quote.ashx'};
+function getToken(){return localStorage.getItem('hx_token')||''}function setToken(t){localStorage.setItem('hx_token',t)}function clearToken(){localStorage.removeItem('hx_token')}
+async function apiGet(u,p={}){const qs=new URLSearchParams(p).toString();const r=await fetch(u+(qs?('?'+qs):''),{headers:{'Accept':'application/json'}});if(!r.ok)throw new Error((await r.json()).error||'Erro');return r.json()}
+async function apiPost(u,b={}){const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(b)});if(!r.ok)throw new Error((await r.json()).error||'Erro');return r.json()}
+function formatBRL(v){return (new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'})).format(v)}
+function ensureAuthOrRedirect(){if(!getToken())window.location.href='login.html'}

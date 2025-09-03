@@ -1,0 +1,13 @@
+<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>High Expert Store – E-commerce</title><link rel="stylesheet" href="static/css/styles.css"><script src="static/js/common.js"></script></head>
+<body><header><div class="brand"><img src="static/img/logo-highexpert.png" alt="High Expert"><h1>High Expert Store</h1></div><nav><a href="index.html">Loja</a><a href="wishlist.html">Favoritos</a><a href="cart.html">Carrinho</a><a href="/orders.html">Pedidos</a><a href="login.html">Entrar</a></nav></header>
+<div class="container"><h2>Produtos em destaque</h2><div style="display:flex; gap:12px; margin:14px 0"><input id="search" placeholder="Buscar por nome ou descrição..." oninput="loadProducts()"><select id="category" onchange="loadProducts()"><option value="">Todas as categorias</option><option value="Camisetas">Camisetas</option><option value="Canecas">Canecas</option><option value="Acessorios">Acessórios</option><option value="Papelaria">Papelaria</option></select></div><div id="grid" class="grid"></div></div>
+<footer class="footer">High Expert Store — Brindes e presentes exclusivos para profissionais de TI</footer>
+<script>
+async function loadProducts(){const q=document.getElementById('search').value;const category=document.getElementById('category').value;try{const data=await apiGet(API.products,{q,category});const grid=document.getElementById('grid');grid.innerHTML='';for(const p of data.items){const card=document.createElement('div');card.className='card';card.innerHTML=`
+<img src="${p.imageUrl||'static/img/placeholder.png'}" alt="${p.name}">
+<div class="p"><div class="badge">${p.category}</div><h3 style="margin:6px 0 8px">${p.name}</h3><p style="min-height:48px;color:#cbd5e1">${(p.description||'').substring(0,90)}...</p>
+<div class="actions"><span class="price">${formatBRL(p.price)}</span><button class="btn" onclick="addToCart(${p.id})">Adicionar</button><button class="btn" onclick="addToWish(${p.id})">Favoritar</button></div></div>`;grid.appendChild(card);}}catch(e){alert('Erro ao carregar produtos: '+e.message);}}
+async function addToCart(id){const t=getToken();if(!t){return window.location='login.html';}try{await apiPost(API.cartAdd,{token:t,productId:id,quantity:1});alert('Produto adicionado ao carrinho!');}catch(e){alert(e.message);}}
+async function addToWish(id){const t=getToken();if(!t){return window.location='login.html';}try{await apiPost(API.wishlistAdd,{token:t,productId:id});alert('Adicionado aos favoritos!');}catch(e){alert(e.message);}}
+loadProducts();
+</script></body></html>

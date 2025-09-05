@@ -1,0 +1,7 @@
+<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Favoritos — High Expert Store</title><link rel="stylesheet" href="static/css/styles.css"><script src="static/js/common.js"></script></head>
+<body onload="ensureAuthOrRedirect(); loadWish();"><header><div class="brand"><img src="static/img/logo-highexpert.png" alt="High Expert"><h1>High Expert Store</h1></div><nav><a href="index.html">Loja</a><a href="wishlist.html">Favoritos</a><a href="cart.html">Carrinho</a></nav></header>
+<div class="container"><h2>Seus favoritos</h2><div id="grid" class="grid"></div></div>
+<script>
+async function loadWish(){const t=getToken();try{const data=await apiGet(API.wishlistList,{token:t});const grid=document.getElementById('grid');grid.innerHTML='';for(const p of data.items){const card=document.createElement('div');card.className='card';card.innerHTML=`<img src="${p.imageUrl||'static/img/placeholder.png'}" alt="${p.name}"><div class="p"><div class="badge">${p.category}</div><h3 style="margin:6px 0 8px">${p.name}</h3><div class="actions"><span class="price">${formatBRL(p.price)}</span><button class="btn" onclick="addToCart(${p.id})">Adicionar</button></div></div>`;grid.appendChild(card);} }catch(e){alert(e.message);}}
+async function addToCart(id){const t=getToken();try{await apiPost(API.cartAdd,{token:t,productId:id,quantity:1});alert('Produto adicionado ao carrinho!');}catch(e){alert(e.message);}}
+</script></body></html>
